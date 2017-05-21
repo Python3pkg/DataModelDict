@@ -29,7 +29,7 @@ class DataModelDict(OrderedDict, object):
         OrderedDict.__init__(self)
         
         #If string or file-like object, call load
-        if len(args) == 1 and (isinstance(args[0], (str, unicode)) or hasattr(args[0], 'read')):            
+        if len(args) == 1 and (isinstance(args[0], str) or hasattr(args[0], 'read')):            
             format = kwargs.get('format', None)
             parse_float = kwargs.get('parse_float', float)
             parse_int = kwargs.get('parse_int', int)
@@ -168,7 +168,7 @@ class DataModelDict(OrderedDict, object):
             match = True
            
             #iterate over all key, value pairs in yes
-            for yes_key, yes_value in yes.iteritems():
+            for yes_key, yes_value in yes.items():
                 key_match = False
                 
                 #iterate over list of all values associated with kwarg_key in the subelement
@@ -184,7 +184,7 @@ class DataModelDict(OrderedDict, object):
           
             #iterate over all key, value pairs in no
             if match:
-                for no_key, no_value in no.iteritems():
+                for no_key, no_value in no.items():
                     key_match = True
                     
                     #iterate over list of all values associated with kwarg_key in the subelement
@@ -218,7 +218,7 @@ class DataModelDict(OrderedDict, object):
             match = True
            
             #iterate over all key, value pairs in yes
-            for yes_key, yes_value in yes.iteritems():
+            for yes_key, yes_value in yes.items():
                 key_match = False
                 
                 #iterate over list of all values associated with kwarg_key in the subelement
@@ -234,7 +234,7 @@ class DataModelDict(OrderedDict, object):
           
             #iterate over all key, value pairs in no
             if match:
-                for no_key, no_value in no.iteritems():
+                for no_key, no_value in no.items():
                     key_match = True
                     
                     #iterate over list of all values associated with kwarg_key in the subelement
@@ -277,7 +277,7 @@ class DataModelDict(OrderedDict, object):
         
         #if format is specified to be json, only try json
         elif format.lower() == 'json':
-            if isinstance(model, (str, unicode)):
+            if isinstance(model, str):
                 self.update(json.loads(model, 
                                        object_pairs_hook=DataModelDict, 
                                        parse_int=parse_int, 
@@ -296,7 +296,7 @@ class DataModelDict(OrderedDict, object):
                     
         #if format is specified to be xml, only try xml
         elif format.lower() == 'xml':
-            if isinstance(model, (str, unicode)) or hasattr(model, 'read'):
+            if isinstance(model, str) or hasattr(model, 'read'):
                 self.update(xmltodict.parse(model,
                                             postprocessor=self.__xml_postprocessor(parse_int, parse_float, convert_NaN),
                                             #self.__xml_postprocessor(parse_int = parse_int, 
@@ -352,7 +352,7 @@ class DataModelDict(OrderedDict, object):
             indent = ''
             newl = ''
         else:
-            indent = ''.join([' ' for i in xrange(indent)])
+            indent = ''.join([' ' for i in range(indent)])
             newl = '\n'
         
         return xmltodict.unparse(deepcopy(self), 
@@ -380,7 +380,7 @@ class DataModelDict(OrderedDict, object):
                               'False': False}
         
         def postprocessor(path, key, value):
-            if not isinstance(value, (str, unicode)):
+            if not isinstance(value, str):
                 return key, value
             if value in parse_constant:
                 return key, parse_constant[value]
@@ -413,15 +413,15 @@ class DataModelDict(OrderedDict, object):
         
         def preprocessor(key, value):
             if hasattr(value, 'iteritems'):
-                for k, v in value.iteritems():
+                for k, v in value.items():
                     value[k] = preprocessor(k,v)[1]
                 return key, value
             elif hasattr(value, '__iter__'):
-                for i in xrange(len(value)):
+                for i in range(len(value)):
                     value[i] = preprocessor(key, value[i])[1]
                 return key, value
             else:
-                if not isinstance(value, (str, unicode)):
+                if not isinstance(value, str):
                     value = repr(value)
                 if value in allow_NaN:
                     return key, allow_NaN[value]
@@ -434,7 +434,7 @@ class DataModelDict(OrderedDict, object):
         """Internal method that recursively searches and yields values for all elements with key matching key."""
         
         if hasattr(var,'iteritems'):
-            for k, v in var.iteritems():
+            for k, v in var.items():
                 if k == key:
                     if isinstance(v, list):
                         for d in v:
@@ -453,10 +453,10 @@ class DataModelDict(OrderedDict, object):
         """Internal method that recursively searches and yields path lists for all elements with key matching key."""
         
         if hasattr(var,'iteritems'):
-            for k, v in var.iteritems():
+            for k, v in var.items():
                 if k == key:
                     if isinstance(v, list):
-                        for i in xrange(len(v)):
+                        for i in range(len(v)):
                             yield [k, i]
                     else:
                         yield [k]
@@ -465,7 +465,7 @@ class DataModelDict(OrderedDict, object):
                         if result is not None:
                             yield [k] + result
                 elif isinstance(v, list):
-                    for i in xrange(len(v)):
+                    for i in range(len(v)):
                         for result in self.__gen_dict_path(key, v[i]):
                             if result is not None:
                                 yield [k, i] + result
